@@ -38,6 +38,7 @@ from .util import prnt, u, U_PLUS
 from .phonenumberutil import PhoneNumberType, number_type
 from .phonenumberutil import PhoneNumberFormat, format_number
 from .phonenumberutil import is_number_type_geographical
+from .tzdata.additional_data import numbering_plan
 try:
     from .tzdata import TIMEZONE_DATA, TIMEZONE_LONGEST_PREFIX
 except ImportError:  # pragma no cover
@@ -79,6 +80,12 @@ def time_zones_for_geographical_number(numobj):
         # Can only hit this arm if there's an internal error in the rest of
         # the library
         raise Exception("Expect E164 number to start with +")
+    if e164_num.startswith('+7'):
+        # RU or KZ mobile number
+        number = int(e164_num[2:])
+        tz_info = filter(lambda data: data['start'] <= number < data['start'] + data['count'], numbering_plan)
+        if tz_info:
+            return tz_info[0]['timezone']
     for prefix_len in range(TIMEZONE_LONGEST_PREFIX, 0, -1):
         prefix = e164_num[1:(1 + prefix_len)]
         if prefix in TIMEZONE_DATA:
