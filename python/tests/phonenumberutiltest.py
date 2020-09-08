@@ -187,9 +187,9 @@ class PhoneNumberUtilTest(TestMetadataTestCase):
         self.assertEqual("0(?:(11|343|3715)15)?", metadata.national_prefix_for_parsing)
         self.assertEqual("9\\1", metadata.national_prefix_transform_rule)
         self.assertEqual("\\2 15 \\3-\\4", metadata.number_format[2].format)
-        self.assertEqual("(9)(\\d{4})(\\d{2})(\\d{4})",
+        self.assertEqual("(\\d)(\\d{4})(\\d{2})(\\d{4})",
                          metadata.number_format[3].pattern)
-        self.assertEqual("(9)(\\d{4})(\\d{2})(\\d{4})",
+        self.assertEqual("(\\d)(\\d{4})(\\d{2})(\\d{4})",
                          metadata.intl_number_format[3].pattern)
         self.assertEqual("\\1 \\2 \\3 \\4", metadata.intl_number_format[3].format)
 
@@ -292,7 +292,7 @@ class PhoneNumberUtilTest(TestMetadataTestCase):
         self.assertEqual(4, phonenumbers.length_of_national_destination_code(number2))
 
     def testGetCountryMobileToken(self):
-        self.assertEqual("1", phonenumbers.country_mobile_token(phonenumbers.country_code_for_region("MX")))
+        self.assertEqual("9", phonenumbers.country_mobile_token(phonenumbers.country_code_for_region("AR")))
         # Country calling code for Sweden, which has no mobile token.
         # Python version change: Use GB instead, which exists in the test metadata
         self.assertEqual("", phonenumbers.country_mobile_token(phonenumbers.country_code_for_region("GB")))
@@ -823,15 +823,6 @@ class PhoneNumberUtilTest(TestMetadataTestCase):
         deShortNumber = PhoneNumber(country_code=49, national_number=123)
         self.assertEqual("123", phonenumbers.format_number_for_mobile_dialing(deShortNumber, "DE", False))
         self.assertEqual("", phonenumbers.format_number_for_mobile_dialing(deShortNumber, "IT", False))
-
-        # Test the special logic for Hungary, where the national prefix must be added before dialing
-        # from a mobile phone for regular length numbers, but not for short numbers.
-        huRegularNumber = PhoneNumber(country_code=36, national_number=301234567)
-        self.assertEqual("06301234567", phonenumbers.format_number_for_mobile_dialing(huRegularNumber, "HU", False))
-        self.assertEqual("+36301234567", phonenumbers.format_number_for_mobile_dialing(huRegularNumber, "JP", False))
-        huShortNumber = PhoneNumber(country_code=36, national_number=104)
-        self.assertEqual("104", phonenumbers.format_number_for_mobile_dialing(huShortNumber, "HU", False))
-        self.assertEqual("", phonenumbers.format_number_for_mobile_dialing(huShortNumber, "JP", False))
 
         # Test the special logic for NANPA countries, for which regular length phone numbers are always
         # output in international format, but short numbers are in national format.
@@ -2956,6 +2947,7 @@ class PhoneNumberUtilTest(TestMetadataTestCase):
             self.fail("Expected exception on __delattr__")
         except TypeError:
             pass
+        self.assertEqual(repr(frozen1), "FrozenPhoneNumber(country_code=39, national_number=236618300, extension=None, italian_leading_zero=True, number_of_leading_zeros=None, country_code_source=0, preferred_domestic_carrier_code=None)")
 
     def testMetadataImmutable(self):
         desc = PhoneNumberDesc(national_number_pattern="\\d{4,8}")

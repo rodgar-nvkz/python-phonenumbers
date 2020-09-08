@@ -64,13 +64,22 @@ COVERAGE=$(shell hash python-coverage 2>&- && echo python-coverage || echo cover
 COVERAGE_FILES=$(subst $(PYDIR),.,$(wildcard $(PYDIR)/phonenumbers/*.py))
 coverage: alldata $(PYDIR)/tests/testdata/__init__.py coverage_clean coverage_generate coverage_report
 coverage_clean:
-	cd $(PYDIR) && $(COVERAGE) -e
+	cd $(PYDIR) && $(COVERAGE) erase
 coverage_generate:
-	cd $(PYDIR) && $(COVERAGE) -x testwrapper.py
+	cd $(PYDIR) && PYTHONPATH=. $(COVERAGE) run testwrapper.py
 coverage_report:
-	cd $(PYDIR) && $(COVERAGE) -m -r $(COVERAGE_FILES)
+	cd $(PYDIR) && $(COVERAGE) report $(COVERAGE_FILES)
 coverage_annotate:
 	cd $(PYDIR) && $(COVERAGE) annotate $(COVERAGE_FILES)
+
+# Lint: requires pycodestyle
+# Explicitly allow:
+#   E501 line too long
+#   E129 visually indented line with same indent as next logical line
+#   E402 module level import not at top of file
+#   W504 line break after binary operator
+lint:
+	cd $(PYDIR) && pycodestyle --ignore E501,E129,E402,W504 phonenumbers/*.py tests/*.py
 
 # Profile
 profile: alldata $(PYDIR)/tests/testdata/__init__.py profile_clean profile_report
@@ -124,7 +133,7 @@ metaclean:
 distclean: clean metaclean
 	rm -rf $(PYDIR)/$(PACKAGE).egg-info
 	rm -rf $(PYDIR)/build
-	rm -f $(PYDIR)/DumpLocale.class
+	rm -f DumpLocale.class
 
 # Create Debian package.  Requires py2dsc, included in the python-stdeb package.
 DEB_PACKAGE=python-$(PACKAGE)

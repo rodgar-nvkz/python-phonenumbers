@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Unit tests for shortnumberinfo.py"""
 
 # Based on original Java code:
@@ -128,6 +127,9 @@ class ShortNumberInfoTest(TestMetadataTestCase):
         unknownCostNumber.national_number = 911
         self.assertEqual(ShortNumberCost.UNKNOWN_COST, expected_cost(unknownCostNumber))
 
+        # Python version extra test: ask for short number for invalid region
+        self.assertEqual(len(shortnumberinfo._example_short_number_for_cost("Bogus", ShortNumberCost.PREMIUM_RATE)), 0)
+
     def testGetExpectedCostForSharedCountryCallingCode(self):
         # Test some numbers which have different costs in countries sharing
         # the same country calling code. In Australia, 1234 is premium-rate,
@@ -172,24 +174,11 @@ class ShortNumberInfoTest(TestMetadataTestCase):
         self.assertEqual(ShortNumberCost.UNKNOWN_COST,
                          shortnumberinfo.expected_cost(ambiguousTollFreeNumber))
 
-    def testGetExampleShortNumber(self):
-        self.assertEqual("110", shortnumberinfo._example_short_number("AD"))
-        self.assertEqual("1010", shortnumberinfo._example_short_number("FR"))
-        self.assertEqual("", shortnumberinfo._example_short_number("001"))
-        self.assertEqual("", shortnumberinfo._example_short_number(None))
-
-    def testGetExampleShortNumberForCost(self):
-        self.assertEqual("3010",
-                         shortnumberinfo._example_short_number_for_cost("FR", ShortNumberCost.TOLL_FREE))
-        self.assertEqual("1023",
-                         shortnumberinfo._example_short_number_for_cost("FR", ShortNumberCost.STANDARD_RATE))
-        self.assertEqual("42000",
-                         shortnumberinfo._example_short_number_for_cost("FR", ShortNumberCost.PREMIUM_RATE))
-        self.assertEqual("",
-                         shortnumberinfo._example_short_number_for_cost("FR", ShortNumberCost.UNKNOWN_COST))
-        # Python version extra test
-        self.assertEqual("",
-                         shortnumberinfo._example_short_number_for_cost("XY", ShortNumberCost.UNKNOWN_COST))
+    def testExampleShortNumberPresence(self):
+        self.assertFalse(len(shortnumberinfo._example_short_number("AD")) == 0)
+        self.assertFalse(len(shortnumberinfo._example_short_number("FR")) == 0)
+        self.assertTrue(len(shortnumberinfo._example_short_number("001")) == 0)
+        self.assertTrue(len(shortnumberinfo._example_short_number(None)) == 0)
 
     def testConnectsToEmergencyNumber_US(self):
         self.assertTrue(connects_to_emergency_number("911", "US"))

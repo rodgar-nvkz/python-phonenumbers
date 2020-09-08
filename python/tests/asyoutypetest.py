@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Unit tests for asyoutypeformatter.py"""
 
 # Based on original Java code:
@@ -70,7 +69,7 @@ class AsYouTypeFormatterTest(TestMetadataTestCase):
         self.assertEqual("+48881231+2", formatter.input_digit('2'))
 
     def testTooLongNumberMatchingMultipleLeadingDigits(self):
-        # See https://github.com/googlei18n/libphonenumber/issues/36
+        # See https://github.com/google/libphonenumber/issues/36
         # The bug occurred last time for countries which have two
         # formatting rules with exactly the same leading digits pattern
         # but differ in length.
@@ -1152,7 +1151,7 @@ class AsYouTypeFormatterTest(TestMetadataTestCase):
         # we should ensure we use the last leading digit pattern, rather than
         # the first one such that it *thinks* it's found a valid formatting
         # rule again.
-        # https://github.com/googlei18n/libphonenumber/issues/437
+        # https://github.com/google/libphonenumber/issues/437
         self.assertEqual("+8698812", formatter.input_digit('2'))
         self.assertEqual("+86988123", formatter.input_digit('3'))
         self.assertEqual("+869881234", formatter.input_digit('4'))
@@ -1173,21 +1172,19 @@ class AsYouTypeFormatterTest(TestMetadataTestCase):
                                    mobile=PhoneNumberDesc(national_number_pattern='NA'),
                                    national_prefix=u("0"),
                                    national_prefix_for_parsing=u("0"),
-                                   number_format=[NumberFormat(pattern='([135][246]|[246][123])(\\d{4})(\\d{4})',
+                                   number_format=[NumberFormat(pattern='([1359][2469]|[2469][1239])(\\d{4})(\\d{4})',
                                                                format=u("\\1 \\2 \\3"),
                                                                leading_digits_pattern=['[1-59]|[78]0'],
                                                                national_prefix_formatting_rule=u("\\1"))])
         PhoneMetadata._region_metadata['XX'] = metadataXX
         phonenumberutil.SUPPORTED_REGIONS.add("XX")
         phonenumberutil.COUNTRY_CODE_TO_REGION_CODE[384] = ("XX",)
-        formatter = AsYouTypeFormatter('XX')
-        # A pattern with "|" in it doesn't get formatting
-        self.assertEqual('1', formatter.input_digit('1'))
-        self.assertEqual('12', formatter.input_digit('2'))
-        self.assertEqual('123', formatter.input_digit('3'))
-        self.assertEqual('1234', formatter.input_digit('4'))
         # Hit internal error arms
-        self.assertEqual("1234", formatter._input_accrued_national_number())
+        formatter = AsYouTypeFormatter('XX')
+        self.assertEqual('1', formatter.input_digit('1'))
+        self.assertEqual("1", formatter._input_accrued_national_number())
+        self.assertEqual('1x', formatter.input_digit('x'))
+        self.assertEqual("1x", formatter._input_accrued_national_number())
         formatter._national_number = ""
         self.assertEqual("", formatter._input_accrued_national_number())
         # Restore normality
