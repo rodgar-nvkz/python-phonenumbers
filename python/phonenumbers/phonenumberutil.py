@@ -84,7 +84,7 @@ _COLOMBIA_MOBILE_TO_FIXED_LINE_PREFIX = unicod("3")
 # code. One example of when this is relevant is when determining the length of
 # the national destination code, which should be the length of the area code
 # plus the length of the mobile token.
-_MOBILE_TOKEN_MAPPINGS = {52: u('1'), 54: u('9')}
+_MOBILE_TOKEN_MAPPINGS = {54: u('9')}
 # Set of country codes that have geographically assigned mobile numbers (see
 # GEO_MOBILE_COUNTRIES below) which are not based on *area codes*. For example,
 # in China mobile numbers start with a carrier indicator, and beyond that are
@@ -322,6 +322,7 @@ def _create_extn_pattern(single_extn_symbols):
             u("\u0434\u043e\u0431|") + u("[") + single_extn_symbols + u("]|int|anexo|\uFF49\uFF4E\uFF54)") +
             u("[:\\.\uFF0E]?[ \u00A0\\t,-]*") + _CAPTURING_EXTN_DIGITS + u("#?|") +
             u("[- ]+(") + _DIGITS + u("{1,5})#"))
+
 
 _EXTN_PATTERNS_FOR_PARSING = _create_extn_pattern(_SINGLE_EXTN_SYMBOLS_FOR_PARSING)
 _EXTN_PATTERNS_FOR_MATCHING = _create_extn_pattern(_SINGLE_EXTN_SYMBOLS_FOR_MATCHING)
@@ -709,8 +710,11 @@ def length_of_national_destination_code(numobj):
     national significant number into NDC and subscriber number. The NDC of a
     phone number is normally the first group of digit(s) right after the
     country calling code when the number is formatted in the international
-    format, if there is a subscriber number part that follows. An example of
-    how this could be used:
+    format, if there is a subscriber number part that follows.
+
+    N.B.: similar to an area code, not all numbers have an NDC!
+
+    An example of how this could be used:
 
     >>> import phonenumbers
     >>> numobj = phonenumbers.parse("18002530000", "US")
@@ -729,7 +733,8 @@ def length_of_national_destination_code(numobj):
     Arguments:
     numobj -- The PhoneNumber object to find the length of the NDC from.
 
-    Returns the length of NDC of the PhoneNumber object passed in.
+    Returns the length of NDC of the PhoneNumber object passed in, which
+    could be zero.
     """
     if numobj.extension is not None:
         # We don't want to alter the object given to us, but we don't want to
@@ -989,7 +994,7 @@ def format_number(numobj, num_format):
 
 
 def format_by_pattern(numobj, number_format, user_defined_formats):
-    """Formats a phone number using client-defined formatting rules."
+    """Formats a phone number using client-defined formatting rules.
 
     Note that if the phone number has a country calling code of zero or an
     otherwise invalid country calling code, we cannot work out things like
@@ -999,8 +1004,10 @@ def format_by_pattern(numobj, number_format, user_defined_formats):
 
     Arguments:
     numobj -- The phone number to be formatted
-    num_format -- The format the phone number should be formatted into
-    user_defined_formats -- formatting rules specified by clients
+    number_format -- The format the phone number should be formatted into,
+              as a PhoneNumberFormat value.
+    user_defined_formats -- formatting rules specified by clients, as a list
+              of NumberFormat objects.
 
     Returns the formatted phone number.
     """
@@ -1178,14 +1185,6 @@ def format_number_for_mobile_dialing(numobj, region_calling_from, with_formattin
                 # the carriers won't connect the call.  Because of that, we return
                 # an empty string here.
                 formatted_number = U_EMPTY_STRING
-        elif is_valid_number and region_code == "HU":
-            # The national format for HU numbers doesn't contain the national
-            # prefix, because that is how numbers are normally written
-            # down. However, the national prefix is obligatory when dialing
-            # from a mobile phone, except for short numbers. As a result, we
-            # add it back here if it is a valid regular length phone number.
-            formatted_number = (ndd_prefix_for_region(region_code, True) +  # strip non-digits
-                                U_SPACE + format_number(numobj_no_ext, PhoneNumberFormat.NATIONAL))
         elif country_calling_code == _NANPA_COUNTRY_CODE:
             # For NANPA countries, we output international format for numbers
             # that can be dialed internationally, since that always works,
@@ -2288,7 +2287,7 @@ def _test_number_length(national_number, metadata, numtype=PhoneNumberType.UNKNO
         return ValidationResult.INVALID_LENGTH
 
     actual_length = len(national_number)
-    # This is safe because there is never an overlap beween the possible lengths and the local-only
+    # This is safe because there is never an overlap between the possible lengths and the local-only
     # lengths; this is checked at build time.
     if actual_length in local_lengths:
         return ValidationResult.IS_POSSIBLE_LOCAL_ONLY

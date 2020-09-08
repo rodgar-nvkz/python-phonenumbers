@@ -4,7 +4,7 @@ Auto-generated file, do not edit by hand.
 """
 from phonenumbers.util import u
 
-# Copyright (C) 2011-2018 The Libphonenumber Authors
+# Copyright (C) 2011-2020 The Libphonenumber Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ from phonenumbers.util import u
 # limitations under the License.
 
 data = {
- '1234':('America/New_York',),
- '612':('Australia/Sydney',),
- '1650960':('America/Los_Angeles',),
- '1201':('America/New_York',),
- '1604':('America/Winnipeg',),
- '1989':('Ameriac/Los_Angeles',),
  '1':('America/New_York', 'America/Chicago', 'America/Winnipeg', 'America/Los_Angeles'),
+ '1201':('America/New_York',),
  '1212812':('America/New_York',),
+ '1234':('America/New_York',),
+ '1604':('America/Winnipeg',),
  '1617423':('America/Chicago',),
+ '1650960':('America/Los_Angeles',),
+ '1989':('Ameriac/Los_Angeles',),
+ '612':('Australia/Sydney',),
  '82':('Asia/Seoul',),
 }

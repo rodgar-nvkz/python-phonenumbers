@@ -1,7 +1,7 @@
 phonenumbers Python Library
 ===========================
 
-This is a Python port of [libphonenumber](https://github.com/googlei18n/libphonenumber).
+This is a Python port of [libphonenumber](https://github.com/google/libphonenumber).
 
 Original Java code is Copyright (C) 2009-2016 The Libphonenumber Authors
 
@@ -117,7 +117,7 @@ Release Procedure
 
  - Ensure that `python/HISTORY.md` file is up-to-date, and includes
    descriptions of changes in this version (adapted from the
-   upstream [release notes](https://github.com/googlei18n/libphonenumber/blob/master/java/release_notes.txt),
+   upstream [release notes](https://github.com/google/libphonenumber/blob/master/java/release_notes.txt),
    skipping the metadata changes chunks).
  - Set the `__version__` field in `python/phonenumbers/__init__.py`
  - Check that the list of symbols in `python/phonenumbers/__init__.py` `__all__` is
@@ -126,9 +126,9 @@ Release Procedure
      `cd tools/python && make metaclean alldata`
  - Check that the unit tests all run successfully:
      `cd tools/python && make test`
- - Optionally, check that metadata regeneration works in Py3k:
+ - Optionally, check that metadata regeneration works in Python 3:
      `cd tools/python && make PYTHON=python3 metaclean alldata`
- - Check that the unit tests all run successfully in Py3k:
+ - Check that the unit tests all run successfully in Python 3:
      `cd tools/python && make PYTHON=python3 test`
  - Check that Python 2.5 is still supported:
      `cd tools/python && make PYTHON=python2.5 test`
@@ -137,6 +137,14 @@ Release Procedure
  - Push the tag to Github with:
      `git push <github-remote> vX.Y.Z`
  - Push the lite package to PyPI with:
-     `cd python && rm -rf build && ./setup.py lite sdist bdist_wheel upload`
+     ```
+     cd python && rm -rf build dist && ./setup.py lite sdist bdist_wheel
+     twine check dist/*
+     twine upload dist/*
+     ```
  - Push the package to PyPI with:
-     `cd python && rm -rf build && ./setup.py sdist bdist_wheel upload`
+     ```
+     cd python && rm -rf build dist && ./setup.py sdist bdist_wheel
+     twine check dist/*
+     twine upload dist/*
+     ```

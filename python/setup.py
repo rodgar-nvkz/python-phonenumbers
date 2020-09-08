@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import distutils.core
+import io
 import sys
 # Importing setuptools adds some features like "setup.py test", but
 # it's optional so swallow the error if it's not there.
@@ -44,21 +45,23 @@ if not lite:
     except ImportError:
         lite = True
 
+with io.open("README.md", mode="r", encoding="utf-8") as readme:
+    long_description = readme.read()
+
 # Various parameters depend on whether we are the lite package or not
 if lite:
     pkgname = 'phonenumberslite'
     pkgs = ['phonenumbers', 'phonenumbers.data', 'phonenumbers.shortdata']
-    pkgstatus = 'Development Status :: 4 - Beta'
-    lite = True
 else:
     pkgname = 'phonenumbers'
     pkgs = ['phonenumbers', 'phonenumbers.data', 'phonenumbers.geodata', 'phonenumbers.shortdata',
             'phonenumbers.carrierdata', 'phonenumbers.tzdata']
-    pkgstatus = 'Development Status :: 5 - Production/Stable'
 
 distutils.core.setup(name=pkgname,
                      version=__version__,
                      description="Python version of Google's common library for parsing, formatting, storing and validating international phone numbers.",
+                     long_description=long_description,
+                     long_description_content_type="text/markdown",
                      author='David Drysdale',
                      author_email='dmd@lurklurk.org',
                      url='https://github.com/daviddrysdale/python-phonenumbers',
@@ -76,5 +79,12 @@ distutils.core.setup(name=pkgname,
                                   'Programming Language :: Python :: 2.6',
                                   'Programming Language :: Python :: 2.7',
                                   'Programming Language :: Python :: 3',
+                                  'Programming Language :: Python :: 3.3',
+                                  'Programming Language :: Python :: 3.4',
+                                  'Programming Language :: Python :: 3.5',
+                                  'Programming Language :: Python :: 3.6',
+                                  'Programming Language :: Python :: 3.7',
+                                  'Programming Language :: Python :: Implementation :: CPython',
+                                  'Programming Language :: Python :: Implementation :: PyPy',
                                   ],
                      )

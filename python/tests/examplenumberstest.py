@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Unit tests for phonenumberutil.py"""
 
 # Based on original Java code:
@@ -18,15 +17,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import sys
-import re
 import unittest
 
 from phonenumbers import PhoneNumberType, PhoneMetadata, NumberParseException
 from phonenumbers import phonenumberutil, PhoneNumber, is_emergency_number
 from phonenumbers import shortnumberinfo, ShortNumberCost, AsYouTypeFormatter
-from phonenumbers import PhoneNumberMatcher, Leniency, is_possible_short_number_for_region
+from phonenumbers import is_possible_short_number_for_region
 from phonenumbers.util import prnt
-from phonenumbers.re_util import fullmatch
 
 
 class ExampleNumbersTest(unittest.TestCase):
@@ -330,3 +327,8 @@ class ExampleNumbersTest(unittest.TestCase):
         short_metadata = PhoneMetadata.short_metadata_for_region("GB")
         result = str(short_metadata)
         self.assertTrue(result.startswith("PhoneMetadata(id='GB', country_code=None, international_prefix=None"))
+
+    def testGBLocalNumberLength(self):
+        # Python version extra test.  Issue #172.
+        numobj = phonenumberutil.parse("+4408001111", "GB")
+        self.assertEqual("+44 800 1111", phonenumberutil.format_number(numobj, phonenumberutil.PhoneNumberFormat.INTERNATIONAL))
