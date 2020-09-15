@@ -83,7 +83,7 @@ def time_zones_for_geographical_number(numobj):
     if e164_num.startswith('+7'):
         # RU or KZ mobile number
         number = int(e164_num[2:])
-        tz_info = filter(lambda data: data['start'] <= number < data['start'] + data['count'], numbering_plan)
+        tz_info = list(filter(lambda data: data['start'] <= number < data['start'] + data['count'], numbering_plan))
         if tz_info:
             return tz_info[0]['timezone']
     for prefix_len in range(TIMEZONE_LONGEST_PREFIX, 0, -1):
